@@ -35,4 +35,21 @@ jobs:
             -f guestbook-frontend/Dockerfile \
             .
           docker push ghcr.io/thesuperswan/guestbook-frontend:latest
+          
+      - uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: "4.20"
 
+      - name: Login to OpenShift
+        run: |
+          oc login \
+            -u "${{ secrets.USERNAME }}" \
+            -p "${{ secrets.PASSWORD }}" \
+            --server="${{ secrets.OCP_SERVER }}" \
+            --insecure-skip-tls-verify
+
+      - name: Select project
+        run: oc project "${{ secrets.OCP_NAMESPACE }}"
+
+      - name: Deploy to OpenShift
+        run: oc apply -f openshift/
