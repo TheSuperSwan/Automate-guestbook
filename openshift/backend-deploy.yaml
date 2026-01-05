@@ -13,14 +13,14 @@ spec:
         app: guestbook-backend-gha
     spec:
       containers:
-        - name: backend-gha
+        - name: backend
           image: ghcr.io/thesuperswan/guestbook-backend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
             - name: DB_HOST
-              value: postgres-gha
+              value: postgres
             - name: DB_PORT
               value: "5432"
             - name: DB_NAME
@@ -49,7 +49,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-gha
+  name: backend
 spec:
   selector:
     app: guestbook-backend-gha
