@@ -1,112 +1,108 @@
 # Automate-guestbook
-Guestbook – CI/CD med GitHub Actions, GHCR och OpenShift
+# Guestbook – CI/CD med GitHub Actions, GHCR och OpenShift
 
 Detta projekt bygger vidare på Guestbook-applikationen och syftar till att demonstrera en komplett CI/CD-pipeline med GitHub Actions, GitHub Container Registry (GHCR) och OpenShift. Fokus i uppgiften ligger inte på att utveckla en ny applikation, utan på att automatisera bygg, publicering och deployment av containers.
 
-Grupp
+---
 
-Gruppnamn: Grupp 5
-Deltagare:
+## Grupp
 
-Baran Kizilca
+**Gruppnamn:** Grupp 5  
+**Deltagare:**
+- Baran Kizilca  
+- *(lägg till övriga namn som faktiskt deltagit)*
 
-(lägg till övriga namn som faktiskt deltagit)
+---
 
-Applikation och arkitektur
+## Applikation och arkitektur
 
 Applikationen består av minst två containers:
 
-Backend – Golang-baserat API
+- **Backend** – Golang-baserat API  
+- **Frontend** – Nginx som serverar HTML/JavaScript och proxyar API-anrop  
 
-Frontend – Nginx som serverar HTML/JavaScript och proxyar API-anrop
+Applikationen körs i OpenShift och använder PostgreSQL som databas samt Redis som cache. Dessa körs som separata services och images i klustret.
 
-Applikationen körs i OpenShift och använder PostgreSQL som databas samt Redis som cache (dessa körs som separata services och images).
+---
 
-CI – Build och publicering av containers
+## CI – Build och publicering av containers
 
-Vid varje push till main triggas en GitHub Actions-workflow som automatiskt:
+Vid varje push till `main` triggas en GitHub Actions-workflow som automatiskt:
 
-Checkar ut koden från repot
-
-Bygger backend-containern från guestbook-backend/Dockerfile
-
-Bygger frontend-containern från guestbook-frontend/Dockerfile
-
-Publicerar båda images till GitHub Container Registry (GHCR)
+- Checkar ut koden från repot  
+- Bygger backend-containern från `guestbook-backend/Dockerfile`  
+- Bygger frontend-containern från `guestbook-frontend/Dockerfile`  
+- Publicerar båda images till GitHub Container Registry (GHCR)  
 
 Exempel på images som skapas:
 
-ghcr.io/thesuperswan/guestbook-backend:latest
+- `ghcr.io/thesuperswan/guestbook-backend:latest`  
+- `ghcr.io/thesuperswan/guestbook-frontend:latest`
 
-ghcr.io/thesuperswan/guestbook-frontend:latest
+---
 
-CD – Deployment till OpenShift
+## CD – Deployment till OpenShift
 
 Samma GitHub Actions-workflow ansvarar även för deployment till OpenShift.
 
 Deploymenten sker genom att workflowet:
 
-Installerar OpenShift CLI (oc)
+- Installerar OpenShift CLI (`oc`)  
+- Loggar in mot OpenShift  
+- Väljer rätt projekt/namespace  
+- Kör `oc apply -f openshift/`  
 
-Loggar in mot OpenShift
+Alla OpenShift-resurser (Deployments, Services, Routes m.m.) ligger samlade i mappen `openshift/`.
 
-Väljer rätt projekt/namespace
+---
 
-Kör oc apply -f openshift/
+## Autentisering mot OpenShift
 
-Alla OpenShift-resurser (Deployments, Services, Routes m.m.) ligger i mappen openshift/.
+I ett CI/CD-sammanhang fungerar inte alltid användarnamn och lösenord eller kortlivade webbtokens. Därför används en **ServiceAccount i OpenShift** för automatiserad deployment.
 
-Autentisering mot OpenShift
+Flödet är följande:
 
-I ett CI/CD-sammanhang fungerar inte alltid användarnamn och lösenord eller kortlivade webbtokens. Därför används en ServiceAccount i OpenShift för automatiserad deployment.
-
-Flödet är:
-
-En ServiceAccount skapas i OpenShift
-
-ServiceAccounten tilldelas rättigheter i projektet
-
-Dess token lagras som en GitHub Secret
-
-GitHub Actions använder denna token för att autentisera mot OpenShift
+- En ServiceAccount skapas i OpenShift  
+- ServiceAccounten tilldelas rättigheter i projektet  
+- Dess token lagras som en GitHub Secret  
+- GitHub Actions använder denna token för att autentisera mot OpenShift  
 
 Detta är standardpraxis i Kubernetes/OpenShift och ger en stabil och säker lösning för automation.
 
-Secrets i GitHub
+---
+
+## Secrets i GitHub
 
 Följande secrets används i GitHub Actions:
 
-OCP_SERVER – OpenShift API-server
-
-OCP_NAMESPACE – OpenShift-projekt
-
-OPENSHIFT_TOKEN – Token kopplad till ServiceAccount
+- `OCP_SERVER` – OpenShift API-server  
+- `OCP_NAMESPACE` – OpenShift-projekt/namespace  
+- `OPENSHIFT_TOKEN` – Token kopplad till ServiceAccount  
 
 Inga känsliga uppgifter är hårdkodade i repot.
 
-Bonus – Resonemang
-Vilka YAML-filer ändras vid uppdateringar?
+---
 
-Vanligtvis är det Deployment-filerna som ändras när en ny image-version ska användas. Services och Routes behöver sällan ändras.
+## Bonus – Resonemang
 
-Behöver man köra oc apply på alla filer?
+### Vilka YAML-filer ändras vid uppdateringar?
+Vanligtvis är det **Deployment-filerna** som ändras när en ny image-version ska användas. Services och Routes behöver sällan ändras.
 
-Nej. Det räcker att köra oc apply på de YAML-filer som har ändrats. I detta projekt används dock oc apply -f openshift/ för enkelhetens skull.
+### Behöver man köra `oc apply` på alla filer?
+Nej. Det räcker att köra `oc apply` på de YAML-filer som har ändrats. I detta projekt används dock `oc apply -f openshift/` för enkelhetens skull.
 
-Vad händer om en ConfigMap ändras?
-
+### Vad händer om en ConfigMap ändras?
 Om en ConfigMap ändras behöver tillhörande Deployment startas om (rollout) för att ändringarna ska slå igenom.
 
-Sammanfattning
+---
+
+## Sammanfattning
 
 Projektet visar ett komplett CI/CD-flöde där:
 
-GitHub Actions automatiskt bygger containers
-
-Images publiceras till GHCR
-
-Applikationen deployas till OpenShift utan manuell inblandning
-
-Säker autentisering hanteras via Secrets och ServiceAccount
+- GitHub Actions automatiskt bygger containers  
+- Images publiceras till GHCR  
+- Applikationen deployas till OpenShift utan manuell inblandning  
+- Säker autentisering hanteras via Secrets och ServiceAccount  
 
 Detta uppfyller samtliga krav i uppgiften och demonstrerar hur en modern, automatiserad containerbaserad deployment kan byggas.
