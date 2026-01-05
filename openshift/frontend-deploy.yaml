@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: guestbook-frontend
+  name: guestbook-frontend-gha
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: guestbook-frontend
+      app: guestbook-frontend-gha
   template:
     metadata:
       labels:
-        app: guestbook-frontend
+        app: guestbook-frontend-gha
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/macfatty/ocp-guestbook-orgi-frontend:latest
+          image: ghcr.io/thesuperswan/guestbook-frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -29,10 +29,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: guestbook-frontend
+  name: guestbook-frontend-gha
 spec:
   selector:
-    app: guestbook-frontend
+    app: guestbook-frontend-gha
   ports:
     - name: http
       port: 8080
