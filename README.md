@@ -10,7 +10,8 @@ Detta projekt bygger vidare på Guestbook-applikationen och syftar till att demo
 **Gruppnamn:** Grupp 5  
 **Deltagare:**
 - Baran Kizilca  
-- *(lägg till övriga namn som faktiskt deltagit)*
+- Viktor Svanholm
+- Gabriella Öhrn
 
 ---
 
