@@ -17,12 +17,11 @@ Detta projekt bygger vidare på Guestbook-applikationen och syftar till att demo
 
 ## Applikation och arkitektur
 
-Applikationen består av minst två containers:
+Applikationen består av tre containers:
 
 - **Backend** – Golang-baserat API  
-- **Frontend** – Nginx som serverar HTML/JavaScript och proxyar API-anrop  
-
-Applikationen körs i OpenShift och använder PostgreSQL som databas samt Redis som cache. Dessa körs som separata services och images i klustret.
+- **Frontend** – Nginx som serverar HTML/JavaScript och proxyar API-anrop
+- **Databas** - Postgresql databas
 
 ---
 
@@ -39,6 +38,8 @@ Exempel på images som skapas:
 
 - `ghcr.io/thesuperswan/guestbook-backend:latest`  
 - `ghcr.io/thesuperswan/guestbook-frontend:latest`
+
+Postgresql-imagen är den enda som inte ligger på GHCR, eftersom den inte behövde byggas om.
 
 ---
 
@@ -77,8 +78,7 @@ Detta är standardpraxis i Kubernetes/OpenShift och ger en stabil och säker lö
 Följande secrets används i GitHub Actions:
 
 - `OCP_SERVER` – OpenShift API-server  
-- `OCP_NAMESPACE` – OpenShift-projekt/namespace  
-- `OPENSHIFT_TOKEN` – Token kopplad till ServiceAccount  
+- `OCP_NAMESPACE` – OpenShift-projekt/namespace   
 
 Inga känsliga uppgifter är hårdkodade i repot.
 
